@@ -29,10 +29,18 @@ You can specify an iteration limit:
 /loop Fix this failing test, max 8 iterations.
 ```
 
+Large limits are allowed when explicit:
+
+```text
+/loop Fix this flaky workflow, max 100 rounds.
+```
+
+For large limits, the skill keeps a scratch log and checkpoints progress at least every 10 attempts.
+
 For improvement work:
 
 ```text
-/loop Improve this benchmark score, max 5 iterations.
+/loop Optimise this benchmark score, max 5 iterations.
 ```
 
 ## Installation

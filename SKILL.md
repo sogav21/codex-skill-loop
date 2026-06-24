@@ -1,6 +1,6 @@
 ---
 name: loop
-description: Unified iterative workflow triggered by /loop, $loop, or requests to keep working until a task is achieved, verified, or improved. Automatically choose Completion Loop for binary success criteria such as fixed/not fixed, tests pass/fail, file exists/missing, UI correct/incorrect, or validation clean/dirty. Choose Research Loop for baseline-and-metric work such as improve, optimize, experiment, benchmark, metric, Sharpe, accuracy, latency, score, drawdown, strategy, prompt, model, or performance improvement unless binary success is clearly intended.
+description: Unified iterative workflow triggered by /loop, $loop, or requests to keep working until a task is achieved, verified, optimized, optimised, or improved. Automatically choose Completion Loop for binary success criteria such as fixed/not fixed, tests pass/fail, file exists/missing, UI correct/incorrect, or validation clean/dirty. Choose Research Loop for baseline-and-metric work such as improve, optimize, optimise, experiment, benchmark, metric, Sharpe, accuracy, latency, score, drawdown, strategy, prompt, model, or performance improvement unless binary success is clearly intended.
 ---
 
 # Loop
@@ -12,12 +12,15 @@ Choose one mode before starting:
 - Completion Loop: Use when success is binary: fixed/not fixed, tests pass/fail, file exists/missing, UI correct/incorrect, validation clean/dirty.
 - Research Loop: Use when there is a baseline and metric: better/worse, faster/slower, higher/lower score, improved strategy, improved prompt, improved model, improved performance.
 
-If the task includes words like improve, optimize, experiment, benchmark, metric, baseline, Sharpe, accuracy, latency, score, drawdown, use Research Loop unless binary success is clearly intended.
+If the task includes words like improve, optimize, optimise, experiment, benchmark, metric, baseline, Sharpe, accuracy, latency, score, drawdown, use Research Loop unless binary success is clearly intended.
 
 ## Shared Rules
 
+- Auto-loop by default: after each attempt, immediately continue to the next attempt unless a stop condition is met.
+- Do not pause to report progress or ask what to try next between attempts unless blocked or approval is required.
 - Do not declare success without verification.
-- Keep iteration count bounded. Default max attempts: 5.
+- Keep iteration count bounded. Default max attempts: 5; use the user's explicit max when provided.
+- For large limits such as 100 rounds, continue only while each attempt can make useful progress, maintain a scratch log, and checkpoint progress at least every 10 attempts.
 - Never repeat the same failed action unchanged.
 - After every failed or inconclusive attempt, update the strategy before retrying.
 - Maintain task-local memory: attempt number, hypothesis or plan, action taken, result, verification evidence, failure reason or metric delta, lesson learned, next strategy adjustment.
@@ -36,7 +39,7 @@ Use this for tasks with pass/fail success criteria.
 5. Execute the smallest useful step.
 6. Verify with evidence.
 7. If success criteria pass, stop.
-8. If not, diagnose failure, adjust strategy, and retry.
+8. If not, diagnose failure, adjust strategy, and immediately retry.
 
 ## Research Loop
 
@@ -52,7 +55,15 @@ Use this for improvement tasks with a baseline and metric.
 8. If better according to the keep rule, keep the change and update baseline.
 9. If worse, revert the change.
 10. If inconclusive, log it and decide whether to retry with a sharper experiment.
-11. Update next hypothesis and repeat.
+11. Update next hypothesis and immediately repeat.
+
+Prefer disciplined optimization:
+
+- Change one variable at a time when practical.
+- Set a minimum meaningful improvement before testing.
+- Keep the evaluation stable enough that before/after comparisons are fair.
+- Treat noisy, flaky, or underpowered results as inconclusive.
+- Revert experiments that improve the metric by cheating the goal, overfitting, or breaking constraints.
 
 For each Research Loop attempt, record:
 
