@@ -1,4 +1,4 @@
 interface:
-  display_name: "Loop"
-  short_description: "Iterate until the task is verified done"
-  default_prompt: "Use $loop to keep iterating on this task until the requested outcome is achieved and verified."
+  display_name: "/loop"
+  short_description: "Completion and research loops with verification"
+  default_prompt: "Use $loop to keep iterating until the task is achieved, verified, or measurably improved."

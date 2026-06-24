@@ -1,18 +1,13 @@
 # Loop Codex Skill
 
-`loop` is a Codex skill for iterative, evidence-based task completion. It is designed for tasks where one pass may not be enough, such as debugging, implementation, UI polish, data cleanup, or test fixing.
+`loop` is a unified Codex skill for iterative, evidence-based work. It activates with `/loop`, `$loop`, or requests to keep working until a task is achieved, verified, or improved.
 
-## What It Does
+## Modes
 
-The skill makes Codex:
+- Completion Loop: for binary outcomes such as fixed/not fixed, tests pass/fail, file exists/missing, UI correct/incorrect, or validation clean/dirty.
+- Research Loop: for baseline-and-metric work such as improving accuracy, latency, score, Sharpe, drawdown, prompt quality, strategy quality, or performance.
 
-- define the target outcome before starting
-- set success criteria and a verification method
-- iterate up to a bounded limit, defaulting to 5 attempts
-- verify each attempt with concrete evidence
-- keep task-local memory of attempts and lessons learned
-- improve the strategy after each failed attempt
-- stop only when success is verified or a clear stop condition is reached
+Both modes use bounded iterations, concrete verification, task-local memory, and a strategy update after every failed or inconclusive attempt.
 
 ## Usage
 
@@ -32,6 +27,12 @@ You can specify an iteration limit:
 
 ```text
 /loop Fix this failing test, max 8 iterations.
+```
+
+For improvement work:
+
+```text
+/loop Improve this benchmark score, max 5 iterations.
 ```
 
 ## Installation
