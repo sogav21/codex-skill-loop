@@ -16,17 +16,22 @@ If the task includes words like improve, optimize, optimise, experiment, benchma
 
 ## Shared Rules
 
-- Auto-loop by default: after each attempt, immediately continue to the next attempt unless a stop condition is met.
+- Start with a goal contract: objective, selected mode, max attempts, success target, verification method, editable scope, and stop conditions.
+- Auto-loop by default: within the current turn, after each attempt, immediately continue to the next attempt until a stop condition is met.
 - Do not pause to report progress or ask what to try next between attempts unless blocked or approval is required.
+- A progress update may summarize work, but it must not replace the next attempt when attempts remain.
+- Do not stop after the first useful change in open-ended improvement work; continue until max attempts, no useful next attempt exists, or another stop condition is met.
 - Do not declare success without verification.
 - Keep iteration count bounded. Default max attempts: 5; use the user's explicit max when provided.
 - For large limits such as 100 rounds, continue only while each attempt can make useful progress, maintain a scratch log, and checkpoint progress at least every 10 attempts.
 - Never repeat the same failed action unchanged.
 - After every failed or inconclusive attempt, update the strategy before retrying.
 - Maintain task-local memory: attempt number, hypothesis or plan, action taken, result, verification evidence, failure reason or metric delta, lesson learned, next strategy adjustment.
+- For Research Loop, also track current baseline, best-so-far result, target gap, and whether the last attempt moved toward the target.
 - For large, risky, long-running, or multi-file tasks, write a scratch log under `memory/scratch/`.
 - Do not update long-term memory unless the user explicitly says to remember it.
 - Stop before destructive or external/public actions unless the user confirms.
+- If the user asks for "ideal", "best", or open-ended quality, translate that into a concrete target and measurable checks before editing.
 
 ## Completion Loop
 
@@ -47,15 +52,19 @@ Use this for improvement tasks with a baseline and metric.
 
 1. Establish baseline.
 2. Define metric and direction: higher is better, or lower is better.
-3. Define verification command or evaluation method.
-4. Define editable scope.
-5. Define keep/revert rule.
-6. Run one controlled experiment per iteration when possible.
-7. Measure result against baseline.
-8. If better according to the keep rule, keep the change and update baseline.
-9. If worse, revert the change.
-10. If inconclusive, log it and decide whether to retry with a sharper experiment.
-11. Update next hypothesis and immediately repeat.
+3. Define target threshold or stopping target: the metric value, score, behavior, or quality bar that means the goal is achieved.
+4. Define verification command or evaluation method.
+5. Define editable scope.
+6. Define keep/revert rule before editing.
+7. Capture the pre-experiment state, such as `git diff`, copied file content, generated artifact backup, or command output needed to revert safely.
+   If no reliable revert path exists, create one before experimenting or narrow the editable scope.
+8. Run one controlled experiment per iteration when possible.
+9. Measure result against baseline and target.
+10. If target is met according to the verification method, keep the change and stop.
+11. If better but target is not met, keep the change, update baseline, choose the next hypothesis, and continue.
+12. If worse, revert the change before the next attempt.
+13. If inconclusive, either revert or keep only if the keep rule allows neutral changes; log why and retry with a sharper experiment.
+14. Update next hypothesis and immediately repeat.
 
 Prefer disciplined optimization:
 
@@ -68,11 +77,14 @@ Prefer disciplined optimization:
 For each Research Loop attempt, record:
 
 - baseline value
+- target threshold or stopping target
 - experiment hypothesis
 - changed files
 - metric before
 - metric after
+- target gap after
 - decision: keep, revert, or inconclusive
+- revert method used or prepared
 - lesson learned
 
 ## Verification Examples
@@ -98,7 +110,7 @@ Stop when success is verified, max attempts are reached, required information or
 
 ## Final Response
 
-Keep the final response concise and include:
+Give a final response only after a stop condition is met. Keep it concise and include:
 
 - selected mode
 - final result

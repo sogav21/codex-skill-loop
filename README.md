@@ -7,7 +7,7 @@
 - Completion Loop: for binary outcomes such as fixed/not fixed, tests pass/fail, file exists/missing, UI correct/incorrect, or validation clean/dirty.
 - Research Loop: for baseline-and-metric work such as improving accuracy, latency, score, Sharpe, drawdown, prompt quality, strategy quality, or performance.
 
-Both modes use bounded iterations, concrete verification, task-local memory, and a strategy update after every failed or inconclusive attempt.
+Both modes use bounded iterations, concrete verification, task-local memory, and a strategy update after every failed or inconclusive attempt. Research Loop also uses a goal contract, controlled experiments, keep/revert decisions, best-so-far tracking, and a revert path before risky edits.
 
 ## Usage
 
@@ -42,6 +42,8 @@ For improvement work:
 ```text
 /loop Optimise this benchmark score, max 5 iterations.
 ```
+
+Research Loop keeps improving until the target is reached, max attempts are used, no useful next experiment remains, or another stop condition applies.
 
 ## Installation
 
