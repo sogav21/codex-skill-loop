@@ -29,12 +29,24 @@ State these fields before the first edit:
 
 - objective
 - mode (`completion` | `research`)
-- measurable success criterion (pass/fail or metric + direction)
+- success criterion set (pass/fail or metric + direction)
 - verification command/evidence
 - editable scope
 - keep/revert rule
 - iteration budget (only if user gave one)
 - stop condition
+
+Full criteria checklist (required for both modes):
+
+- target and exact pass rule are explicit
+- verification command is defined and executable
+- expected evidence is defined
+- hypothesis/action is minimal and focused
+- failure reason and next adjustment are logged
+- decision class is one of: pass, keep, revert, inconclusive, blocked
+- rollback/rollback_ok is considered
+- state counters are updated
+- target gap is recalculated when metric is used
 
 For Research:
 
@@ -42,6 +54,8 @@ For Research:
 - best-so-far target definition
 - minimum meaningful improvement
 - hypothesis queue/order
+
+This checklist must be completed in every 1-loop cycle before claiming stop.
 
 ## Workspace and evidence
 
