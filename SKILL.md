@@ -79,27 +79,22 @@ Rules:
 
 For Research, if a change improves metric but misses minimum delta, mark inconclusive and run a stronger next experiment.
 
-## Completion Loop
+## Completion Loop and Research Loop (same core loop)
+
+Both modes use the same iteration flow above. The only difference is the contract and pass criteria:
+
+- Completion: pass/fail success gate (`done` / `not done`).
+- Research: baseline-to-target metric gate, with minimum meaningful improvement.
+
+Shared loop body:
 
 1. Define objective, target, verification.
 2. Execute smallest useful edit.
 3. Verify with evidence.
-4. If verified, stop.
-5. If not, diagnose and retry with a new approach.
-6. If outcome remains uncertain after verification attempts, label inconclusive and retry (or stop only on blocker/no useful step).
-
-## Research Loop
-
-1. Set baseline and direction (higher/lower better).
-2. Define target threshold or stop score.
-3. Define keep/revert policy before editing.
-4. Run one controlled experiment per attempt.
-5. Measure metric and compute gap.
-6. Keep/revert/retest according to result class:
-   - `keep`: improvement > minimum delta
-   - `revert`: worse or invalid scope/constraint change
-   - `inconclusive`: no reliable delta
-7. Continue until target met or no useful next hypothesis.
+4. Update metric/progress (for Research: compute delta vs target).
+5. Decide `keep`, `revert`, or `retry`.
+6. Update logs/state.
+7. If verified target is met, stop; otherwise retry with a new approach.
 
 ## Diff and rollback
 
@@ -128,4 +123,3 @@ When stopping, report only:
 - kept/reverted/inconclusive counts
 - for Research: baseline → final metric, delta, percent, decision (kept/reverted/inconclusive)
 - remaining blocker/risk
-
