@@ -11,6 +11,27 @@ description: Codex-optimized iterative workflow for /loop and $loop with goal-ba
 - `$loop`
 - user asks to keep working until verified, optimize, improve, iterate, or run research
 
+## Pre-loop intake
+
+Before starting the first loop iteration, check whether the request is concrete enough to run safely and usefully.
+
+If any of these are missing or ambiguous, ask for them first and do not start looping yet:
+
+- exact target outcome or problem statement
+- the file, subsystem, or surface to work on
+- what counts as success or done
+- whether the user wants completion mode or research mode
+- any explicit attempt budget, deadline, or stop condition
+
+Keep the intake short and focused:
+
+- ask up to 3 questions at once
+- prefer questions that unblock the next iteration directly
+- split broad prompts into smaller parts and confirm each part only when needed
+- if the user already gave enough detail, skip questions and start the loop immediately
+
+After intake, restate the working objective in one sentence before the first iteration.
+
 ## Mode selection
 
 - **Completion mode**: binary success (pass/fail, exists/missing, fixed/broken, valid/invalid).
@@ -22,6 +43,17 @@ description: Codex-optimized iterative workflow for /loop and $loop with goal-ba
 - Do not add an attempt limit unless the user explicitly asks for one.
 - If user gives explicit `N rounds`, treat it as a hard attempt budget.
 - If no budget is given, keep looping until target is verified or a non-recoverable stop rule is hit.
+
+## Research pass definition
+
+When operating in research mode, `pass` means all of the following are true:
+
+- the user-defined research objective is explicit enough to measure
+- the target metric reached the requested direction or threshold
+- the final result is reproducible from the recorded evidence
+- any remaining ambiguity about what "loop research" means has been resolved into a concrete measurable target
+
+If the user has not provided a concrete research target yet, ask for it before the first iteration instead of guessing.
 
 ## Codex goal contract (required)
 
@@ -161,3 +193,13 @@ Add these required stop fields:
 - `attempt_limit`: `explicit <N>` or `none`
 - `iterations_run`: integer
 - `stopped_for`: `success|budget|blocked|hypothesis_stagnation`
+
+## GitHub merge on pass
+
+If the user asked to merge on success, then after a verified `pass`:
+
+- prepare the minimal merge-ready change set
+- use the GitHub workflow available in the workspace to merge the branch or PR
+- report the merge target and the verification evidence in the final handoff
+
+Do not merge before the `pass` condition is verified.
