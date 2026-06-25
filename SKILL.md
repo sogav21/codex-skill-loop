@@ -1,65 +1,77 @@
 ---
 name: loop
-description: Auto-iterate `/loop` and `$loop` tasks with verified completion/research loops, compact logging, and explicit stop conditions.
+description: Codex-optimized iterative workflow for /loop and $loop with goal-based execution, verifiable evidence, and explicit keep/revert logic.
 ---
 
 # Loop
 
+## Trigger
+
+- `/loop`
+- `$loop`
+- user asks to keep working until verified, optimize, improve, iterate, or run research
+
 ## Mode selection
 
-1. Use **Completion Loop** for binary outcomes:
-   - fixed/not fixed
-   - tests pass/fail
-   - file exists/missing
-   - UI correct/incorrect
-2. Use **Research Loop** when success is baseline+metric:
-   - better/worse, faster/slower, higher/lower score
-   - optimize, improve, benchmark, latency, Sharpe, drawdown, etc.
-3. If ambiguous, infer from user wording and keep both in scope:
-   - binary intent → Completion
-   - performance/quality intent → Research
+- Completion mode: binary success (pass/fail, exists/missing, fixed/broken, valid/invalid).
+- Research mode: metric-based success (improve/worsen, faster/slower, higher/lower score).
+- If ambiguous, choose the mode that gives the clearest measurable success check.
+- If user gives explicit `N rounds`, treat it as hard attempt budget; otherwise loop by objective.
 
-## Always trigger
+## Codex goal contract (required)
 
-Triggering phrases: `/loop`, `$loop`, “keep working until”, “improve”, “optimize”, “run until verified”.
-
-## Pre-flight contract (required per run)
-
-State these fields before the first edit:
+Before first edit, write a compact goal card:
 
 - objective
-- mode (`completion` | `research`)
-- success criterion set (pass/fail or metric + direction)
-- verification command/evidence
-- editable scope
+- measurable goal (pass/fail or metric + direction)
+- hypothesis queue / action order (1 action per iteration)
+- success rule (the exact condition for done)
+- stop rule (why you will stop)
+- verification command(s)
+- evidence required (commands, tests, files, screenshots, benchmark output)
+- scope and constraints
 - keep/revert rule
-- iteration budget (only if user gave one)
-- stop condition
+- budget handling (explicit count or no budget)
 
-Full criteria checklist (required for both modes):
+Use this as a running goal object through all iterations.
 
-- target and exact pass rule are explicit
-- verification command is defined and executable
-- expected evidence is defined
-- hypothesis/action is minimal and focused
-- failure reason and next adjustment are logged
-- decision class is one of: pass, keep, revert, inconclusive, blocked
-- rollback/rollback_ok is considered
-- state counters are updated
-- target gap is recalculated when metric is used
+## Shared 1-loop cycle (both modes)
 
-For Research:
+Each iteration is one cycle:
 
-- baseline value
-- best-so-far target definition
-- minimum meaningful improvement
-- hypothesis queue/order
+1. Load state and choose next hypothesis/action.
+2. Make one minimal change only.
+3. Run the planned verification command(s).
+4. Record attempt evidence immediately.
+5. Update `loop_project/state.json` counters.
+6. Decide: `keep`, `revert`, or `retry`.
+7. Continue to next cycle if stop rule not met.
 
-This checklist must be completed in every 1-loop cycle before claiming stop.
+Decision classes:
 
-## Workspace and evidence
+- `pass` = verified success criteria for the mode
+- `keep` = useful progress, not yet finished
+- `revert` = harmful or out-of-scope, revert immediately
+- `inconclusive` = no reliable evidence or too little signal
+- `blocked` = external/tool/permission/risk prevents safe progress
 
-Create/ensure under task root:
+Rules:
+
+- Never claim success without evidence.
+- Never repeat the same failed action unchanged.
+- Do not send progress-only turns when task not finished.
+- Always use deterministic command/output evidence where possible.
+- If interrupted, resume from last saved state and continue loop.
+
+## Completion vs Research (same core, different checks)
+
+- Completion mode target check: `done` vs `not done`.
+- Research mode target check: metric movement to target + minimum meaningful delta.
+- Shared workflow and logging remain identical.
+
+## Workspace contract
+
+Create/ensure:
 
 - `loop_project/state.json`
 - `loop_project/attempts.jsonl`
@@ -67,73 +79,48 @@ Create/ensure under task root:
 - `loop_project/diff.patch`
 - `loop_project/README.md`
 
-If workspace cannot be created or `git` is unavailable, take deterministic file snapshots (`.bak`) before risky edits.
+If `git` is not available for rollback, use deterministic snapshots (`.bak`) before risky edits.
 
-## Iteration behavior
+## Codex execution abilities (required)
 
-For each iteration:
+Prefer these tools in this order:
 
-1. choose one minimal action (do not batch unrelated changes),
-2. apply it,
-3. run verification,
-4. classify result (`pass` / `inconclusive` / `blocked`),
-5. append one line to `attempts.jsonl`,
-6. update `state.json`,
-7. stop if verified target reached, else adjust and continue.
+- `rg` for fast discovery
+- `Get-Content` / file read for quick checks
+- `git diff` for change diff
+- `apply_patch` for deterministic edits
+- `attempts/state/metrics` jsonl updates as compact logs
 
-Rules:
+Use the lightest command set that still produces verifiable evidence.
 
-- Never repeat the same failed action unchanged.
-- If result is inconclusive, tighten the next experiment and retry.
-- Do not claim success without evidence.
-- Keep looping after the first positive in optimization tasks unless target is verified.
-- Stop only on verified success, explicit budget hit, blocker, or no useful non-repeating hypothesis.
-- Never end after reporting progress; progress updates do not replace the next attempt.
-- If a command/test/check is interrupted, retry briefly, then continue from last saved state.
+## Logging format
 
-For Research, if a change improves metric but misses minimum delta, mark inconclusive and run a stronger next experiment.
+Attempt entry (one line json):
 
-## Completion Loop and Research Loop (same core loop)
+- `{"attempt":1,"mode":"completion|research","hypothesis":"...","action":"...","result":"pass|keep|revert|inconclusive|blocked","metric_before":12,"metric_after":14,"delta":2,"changed_files":["..."],"verification_cmd":"...","verification":"...","decision":"...","failure_reason":"","lesson":"...","next_adjustment":"...","rollback_ok":true}`
 
-Both modes use the same iteration flow above. The only difference is the contract and pass criteria:
+Metric entry (one line json):
 
-- Completion: pass/fail success gate (`done` / `not done`).
-- Research: baseline-to-target metric gate, with minimum meaningful improvement.
+- `{"attempt":1,"metric_name":"loop_score","value_before":12,"value_after":14,"delta":2,"direction":"higher|lower","unit":"count","notes":"...","verification":"...","rollback_ok":true}`
 
-Shared loop body:
+State file:
 
-1. Define objective, target, verification.
-2. Execute smallest useful edit.
-3. Verify with evidence.
-4. Update metric/progress (for Research: compute delta vs target).
-5. Decide `keep`, `revert`, or `retry`.
-6. Update logs/state.
-7. If verified target is met, stop; otherwise retry with a new approach.
+- include `attempt`, `kept`, `reverted`, `inconclusive`, `baseline_metric`, `best_metric`, `last_action_files`.
 
 ## Diff and rollback
 
-- Capture pre-change state (`git diff` or `.bak`) before risky edits.
-- Append exact patch for each kept change to `loop_project/diff.patch`.
-- If reverting later, write revert action to `attempts.jsonl` and only mark `rollback_ok=true` after verification.
+Before risky edits, record baseline (`git diff` or snapshot).
+For each kept change, append to `loop_project/diff.patch`.
+If a kept change is reverted, log revert action and set `rollback_ok=true` only after verification.
 
-## Logging templates
+## Final response format
 
-Attempt line:
-
-- `{"timestamp":"...","attempt":1,"mode":"research","hypothesis":"...","action":"...","result":"pass|inconclusive|blocked","evidence":"...","verification_cmd":"...","metric_name":"...","metric_before":12,"metric_after":14,"delta":2,"changed_files":["..."],"target_gap_before":10,"target_gap_after":8,"decision":"kept|reverted|inconclusive","failure_reason":"","lesson":"...","next_adjustment":"...","rollback_ok":true}`
-
-Metric line:
-
-- `{"attempt":1,"metric_name":"loop_skill_readiness_score","value_before":12,"value_after":14,"delta":2,"unit":"count","notes":"...","verification":"...","rollback_ok":true,"attempted_action":"..."}`
-
-## Final response
-
-When stopping, report only:
+When stopping, return only:
 
 - selected mode
 - final result
-- verification done
-- attempts run
-- kept/reverted/inconclusive counts
-- for Research: baseline → final metric, delta, percent, decision (kept/reverted/inconclusive)
-- remaining blocker/risk
+- verification evidence
+- iteration count
+- completion/research stats: kept/reverted/inconclusive
+- Research: baseline -> final metric, delta, percent (if meaningful)
+- reason for stop (target reached, budget reached, blocker, or no useful hypothesis)
