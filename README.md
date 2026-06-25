@@ -1,63 +1,70 @@
-# Loop Codex Skill
+# Loop Skill
 
-`loop` is a unified Codex skill for iterative, evidence-based work. It activates with `/loop`, `$loop`, or requests to keep working until a task is achieved, verified, or improved.
+`loop` is a Codex skill for iterative, evidence-based execution.
 
-## Modes
+It activates on:
 
-- Completion Loop: for binary outcomes such as fixed/not fixed, tests pass/fail, file exists/missing, UI correct/incorrect, or validation clean/dirty.
-- Research Loop: for baseline-and-metric work such as improving accuracy, latency, score, Sharpe, drawdown, prompt quality, strategy quality, or performance.
+- `/loop`
+- `$loop`
+- phrases like “keep working until”, “improve”, “optimize”, “run until verified”
 
-Both modes use concrete verification, task-local memory, and a strategy update after every failed or inconclusive attempt. Goal-driven loops continue until the target is verified, blocked, or no useful next move remains. Research Loop also uses a goal contract, controlled experiments, keep/revert decisions, best-so-far tracking, a revert path before risky edits, and final improvement stats with before/after metrics when measurable.
+## Behavior
 
-## Usage
+The skill uses one shared execution engine for both modes:
 
-Trigger it with:
+- completion mode (binary success: pass/fail, exists/missing, fixed/broken)
+- research mode (metric success: better/worse, higher/lower score, faster/slower)
 
-```text
-/loop
-```
+Both modes run the same per-iteration loop:
 
-or:
+1. load state and pick one hypothesis/action
+2. apply one minimal change
+3. run verification
+4. log attempt and evidence
+5. update counters in `loop_project/state.json`
+6. continue or stop based on explicit rules
 
-```text
-Use $loop to keep iterating on this task until it is verified done.
-```
+## Goal-first contract
 
-You can optionally specify an iteration budget:
+Before editing, the skill must state a compact goal card:
 
-```text
-/loop Fix this failing test, 8 rounds.
-```
+- objective
+- measurable success criterion
+- verification command(s) + expected evidence
+- stop rule
+- scope and constraints
+- keep/revert rule
+- hypothesis ordering
 
-Large budgets are allowed when explicit:
+## Logging
 
-```text
-/loop Fix this flaky workflow, 100 rounds.
-```
+When `/loop` runs in a project, the following are maintained:
 
-For large explicit budgets, the skill keeps a scratch log and checkpoints progress at least every 10 attempts.
+- `loop_project/state.json`
+- `loop_project/attempts.jsonl`
+- `loop_project/metrics.jsonl`
+- `loop_project/diff.patch`
+- `loop_project/README.md`
 
-For improvement work:
+## Usage examples
 
-```text
-/loop Optimise this benchmark score until the target latency is under 200 ms.
-```
+- `/loop Fix this test, 8 rounds.`
+- `/loop Improve this score until latency is under 200 ms.`
+- `/loop Optimise quality and stop on best verified improvement.`
 
-Research Loop keeps improving until the target is reached, an explicit user-provided budget is used, no useful next experiment remains, or another stop condition applies. If the user does not provide a round count, the skill must not invent one.
+If no round count is provided, the skill loops until:
 
-## Installation
+- target verified, or
+- explicit blocker, or
+- no useful non-repeating hypothesis.
 
-Copy this repository's contents into a Codex skill folder named `loop`, for example:
+## Install
 
-```text
-loop/
-  SKILL.md
-  agents/openai.yaml
-```
+Copy this repo to:
 
-Then restart or refresh Codex so the skill is discovered.
+`<codex-root>/skills/loop/`
 
-## Files
+with:
 
-- `SKILL.md`: The skill instructions.
-- `agents/openai.yaml`: UI metadata for Codex skill listings.
+- `SKILL.md`
+- `agents/openai.yaml`
