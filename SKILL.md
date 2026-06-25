@@ -19,7 +19,7 @@ If the task includes words like improve, optimize, optimise, experiment, benchma
 - Start with a goal contract: objective, selected mode, target result, success criteria or metric target, verification method, editable scope, keep/revert rule when relevant, and stop conditions.
 - For goal-driven work, do not invent an attempt limit. Continue until the verified target is reached, a real blocker is hit, no useful next move remains, or user/tool safety requires stopping.
 - If the user requests optimise/improve/iterate and does not provide a clear metric/target, you MUST infer a concrete, measurable target in the goal contract before the first edit (for example: reduce time by 20%, fix 1 specific regression, improve score by X points, etc.) and state it explicitly in the contract.
-- Use an iteration budget only when the user explicitly gives one. If the task is open-ended, first translate it into a measurable target and then loop toward that target.
+ - Use an iteration budget only when the user explicitly gives one. If the task is open-ended, first translate it into a measurable target and then loop toward that target.
 - Treat any user-provided round count as a work budget, not a stopping excuse: if the target is reached early, stop; if the budget ends before success, report the remaining gap and the next best move.
 - Auto-loop by default: within the current turn, after each attempt, immediately continue to the next attempt until a stop condition is met.
 - Hard-stop rule: never end a Research Loop on a single small/neutral change. At least one additional hypothesis test must be attempted after first edit unless stop condition is already verified by evidence.
@@ -84,6 +84,7 @@ Use this for improvement tasks with a baseline and metric.
 15. If inconclusive, either revert or keep only if the keep/revert rule allows neutral changes; log why and retry with a sharper experiment.
 16. Update next hypothesis and immediately repeat.
 17. For goal-driven optimization, keep experimenting until the metric target or behavioral target is verified. Do not stop merely because the first improvement was positive.
+
 
 Prefer disciplined optimization:
 

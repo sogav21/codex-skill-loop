@@ -1,4 +1,4 @@
 interface:
   display_name: "/loop"
   short_description: "Verified loops with experiments, revert, and stats"
-  default_prompt: "Use $loop to keep iterating with verified attempts, experiments, revert decisions, and final improvement stats until the target is reached."
+  default_prompt: "Use $loop to keep iterating with verified attempts, experiments, revert decisions, and final improvement stats until the target is reached, without inventing a round limit unless the user provides one."
