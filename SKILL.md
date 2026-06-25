@@ -1,4 +1,3 @@
-
 ---
 name: loop
 description: Unified iterative workflow triggered by /loop, $loop, or requests to keep working until a task is achieved, verified, optimized, optimised, improved, or reported with improvement stats. Automatically choose Completion Loop for binary success criteria such as fixed/not fixed, tests pass/fail, file exists/missing, UI correct/incorrect, or validation clean/dirty. Choose Research Loop for baseline-and-metric work such as improve, optimize, optimise, experiment, benchmark, metric, Sharpe, accuracy, latency, score, drawdown, strategy, prompt, model, or performance improvement unless binary success is clearly intended. Goal-driven loops continue until the verified target is reached, blocked, or no useful next move remains.
