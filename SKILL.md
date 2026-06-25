@@ -1,6 +1,6 @@
 ---
 name: loop
-description: Unified iterative workflow triggered by /loop, $loop, or requests to keep working until a task is achieved, verified, optimized, optimised, or improved. Automatically choose Completion Loop for binary success criteria such as fixed/not fixed, tests pass/fail, file exists/missing, UI correct/incorrect, or validation clean/dirty. Choose Research Loop for baseline-and-metric work such as improve, optimize, optimise, experiment, benchmark, metric, Sharpe, accuracy, latency, score, drawdown, strategy, prompt, model, or performance improvement unless binary success is clearly intended.
+description: Unified iterative workflow triggered by /loop, $loop, or requests to keep working until a task is achieved, verified, optimized, optimised, improved, or reported with improvement stats. Automatically choose Completion Loop for binary success criteria such as fixed/not fixed, tests pass/fail, file exists/missing, UI correct/incorrect, or validation clean/dirty. Choose Research Loop for baseline-and-metric work such as improve, optimize, optimise, experiment, benchmark, metric, Sharpe, accuracy, latency, score, drawdown, strategy, prompt, model, or performance improvement unless binary success is clearly intended.
 ---
 
 # Loop
@@ -17,8 +17,9 @@ If the task includes words like improve, optimize, optimise, experiment, benchma
 ## Shared Rules
 
 - Start with a goal contract: objective, selected mode, max attempts, success target, verification method, editable scope, and stop conditions.
+- Say max attempts before starting. Default to 5. Treat large limits as an upper bound, not a reason to waste attempts after useful progress is exhausted.
 - Auto-loop by default: within the current turn, after each attempt, immediately continue to the next attempt until a stop condition is met.
-- Do not pause to report progress or ask what to try next between attempts unless blocked or approval is required.
+- Do not pause to report progress, ask what to try next, or end the turn after one attempt unless a stop condition is met.
 - A progress update may summarize work, but it must not replace the next attempt when attempts remain.
 - Do not stop after the first useful change in open-ended improvement work; continue until max attempts, no useful next attempt exists, or another stop condition is met.
 - Do not declare success without verification.
@@ -28,10 +29,20 @@ If the task includes words like improve, optimize, optimise, experiment, benchma
 - After every failed or inconclusive attempt, update the strategy before retrying.
 - Maintain task-local memory: attempt number, hypothesis or plan, action taken, result, verification evidence, failure reason or metric delta, lesson learned, next strategy adjustment.
 - For Research Loop, also track current baseline, best-so-far result, target gap, and whether the last attempt moved toward the target.
+- For any improvement, optimization, refactor-for-speed, or quality loop, collect end-of-loop improvement stats: before/after, delta, percent change when meaningful, and the best verified proxy when the ideal metric is unavailable.
 - For large, risky, long-running, or multi-file tasks, write a scratch log under `memory/scratch/`.
 - Do not update long-term memory unless the user explicitly says to remember it.
 - Stop before destructive or external/public actions unless the user confirms.
 - If the user asks for "ideal", "best", or open-ended quality, translate that into a concrete target and measurable checks before editing.
+
+Before the first attempt, state this compact contract:
+
+- target outcome
+- selected mode and why
+- max attempts
+- success metric or pass/fail criteria
+- verification command or evidence
+- revert/keep rule for changes
 
 ## Completion Loop
 
@@ -87,6 +98,17 @@ For each Research Loop attempt, record:
 - revert method used or prepared
 - lesson learned
 
+At the end of every Research Loop, report improvement stats:
+
+- baseline metric and final metric
+- absolute delta and percentage delta when meaningful
+- best kept experiment and why it was kept
+- attempts kept, reverted, and inconclusive
+- verification command or evidence used
+- any stats that could not be measured reliably
+
+Use this shape when possible: `metric: before -> after, delta, percent`; `attempts: total, kept, reverted, inconclusive`; `evidence: command output, test count, screenshot, diff, benchmark, or validated file check`.
+
 ## Verification Examples
 
 - Code: tests, type checks, linters, targeted scripts, command output.
@@ -116,5 +138,7 @@ Give a final response only after a stop condition is met. Keep it concise and in
 - final result
 - verification performed
 - iteration count
+- improvement stats for optimization or quality loops, including before/after, delta, and percent change when measurable
 - for Research Loop: baseline, final metric, and kept/reverted decision
+- whether max attempts was reached or the loop stopped because no useful next attempt remained
 - remaining blocker or risk, if any
