@@ -13,10 +13,15 @@ description: Codex-optimized iterative workflow for /loop and $loop with goal-ba
 
 ## Mode selection
 
-- Completion mode: binary success (pass/fail, exists/missing, fixed/broken, valid/invalid).
-- Research mode: metric-based success (improve/worsen, faster/slower, higher/lower score).
-- If ambiguous, choose the mode that gives the clearest measurable success check.
-- If user gives explicit `N rounds`, treat it as hard attempt budget; otherwise loop by objective.
+- **Completion mode**: binary success (pass/fail, exists/missing, fixed/broken, valid/invalid).
+- **Research mode**: metric-based success (improve/worsen, faster/slower, higher/lower score).
+- Auto mode selection:
+  - Choose completion mode for explicit binary outcomes (`fixed`, `pass`, `exists`, `valid`, `success`).
+  - Choose research mode for optimization/reasoning words (`improve`, `optimize`, `benchmark`, `metric`, `faster`, `score`, `latency`, `Sharpe`, `accuracy`, `recall`, `precision`, `drawdown`) unless user clearly states a binary target.
+  - If intent is mixed, pick the mode with the clearest verifiable end condition.
+- Do not add an attempt limit unless the user explicitly asks for one.
+- If user gives explicit `N rounds`, treat it as a hard attempt budget.
+- If no budget is given, keep looping until target is verified or a non-recoverable stop rule is hit.
 
 ## Codex goal contract (required)
 
@@ -31,7 +36,21 @@ Before first edit, write a compact goal card:
 - evidence required (commands, tests, files, screenshots, benchmark output)
 - scope and constraints
 - keep/revert rule
-- budget handling (explicit count or no budget)
+- attempt budget handling (`N` rounds if explicit; otherwise no fixed budget)
+- do not write to long-term memory; keep task-local memory in attempt logs/state only.
+
+Before the first iteration, set a **working objective**:
+
+- objective summary
+- exact success condition(s)
+- measurable target and baseline/method (for research)
+- hypothesis stack (one action per attempt)
+- stop conditions in priority order:
+  1. success verified
+  2. explicit budget exhausted
+  3. user-blocked external action required
+  4. repeated no-improvement attempts with no new hypothesis (`stop`)
+- for risky, multi-file, or long-running tasks, keep a scratch log in `memory/scratch/` with each attempt record.
 
 Use this as a running goal object through all iterations.
 
@@ -46,6 +65,17 @@ Each iteration is one cycle:
 5. Update `loop_project/state.json` counters.
 6. Decide: `keep`, `revert`, or `retry`.
 7. Continue to next cycle if stop rule not met.
+
+### Autoloop contract
+
+- Default to `while not done` with explicit state persisted every iteration.
+- On every attempt, run exactly one smallest action, verify immediately, then:
+  - `pass` -> stop and report success
+  - `keep` -> continue with improved/next hypothesis
+  - `revert` -> rollback and continue only if objective still open
+  - `inconclusive`/`blocked` -> retry with a changed strategy once; if repeated without new evidence in 2 consecutive attempts, stop as `blocked`
+- Never stop because partial progress was made if target is still not verified.
+- Never repeat the same failed action unchanged; if no fresh hypothesis is available, stop with explicit blocker reason.
 
 Decision classes:
 
@@ -62,6 +92,7 @@ Rules:
 - Do not send progress-only turns when task not finished.
 - Always use deterministic command/output evidence where possible.
 - If interrupted, resume from last saved state and continue loop.
+- Never stop a research loop only because of first neutral/positive change; verify that either target is reached or the next attempt is no longer useful.
 
 ## Completion vs Research (same core, different checks)
 
@@ -124,3 +155,9 @@ When stopping, return only:
 - completion/research stats: kept/reverted/inconclusive
 - Research: baseline -> final metric, delta, percent (if meaningful)
 - reason for stop (target reached, budget reached, blocker, or no useful hypothesis)
+
+Add these required stop fields:
+
+- `attempt_limit`: `explicit <N>` or `none`
+- `iterations_run`: integer
+- `stopped_for`: `success|budget|blocked|hypothesis_stagnation`

@@ -1,4 +1,4 @@
 interface:
   display_name: "/loop"
   short_description: "Codex-optimized /loop /$loop with goal-based execution, evidence-first verification, and keep/revert-safe iteration."
-  default_prompt: "Use /loop or $loop when a task needs repeated execution until verified. Build a goal contract first, then run one minimal attempt per cycle with measurable success checks, evidence logging, and explicit stop conditions."
+  default_prompt: "Use /loop or $loop when a task needs repeated execution until verified. Build a goal contract first, then run one minimal attempt per cycle with measurable success checks, evidence logging, and auto-looping until success or blocker (or explicit budget)."

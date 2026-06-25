@@ -6,7 +6,7 @@ It activates on:
 
 - `/loop`
 - `$loop`
-- phrases like “keep working until”, “improve”, “optimize”, “run until verified”
+- phrases like "keep working until", "improve", "optimize", "run until verified"
 
 ## Behavior
 
@@ -57,6 +57,12 @@ If no round count is provided, the skill loops until:
 - target verified, or
 - explicit blocker, or
 - no useful non-repeating hypothesis.
+
+When stopping without explicit limit, keep loop state with:
+
+- `attempt_limit`: `explicit N` or `none`
+- `iterations_run`: total attempts
+- `stopped_for`: `success|budget|blocked|hypothesis_stagnation`
 
 ## Install
 
