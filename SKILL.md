@@ -1,6 +1,6 @@
 ---
 name: loop
-description: Unified iterative workflow triggered by /loop, $loop, or requests to keep working until a task is achieved, verified, optimized, optimised, improved, or reported with improvement stats. Automatically choose Completion Loop for binary success criteria such as fixed/not fixed, tests pass/fail, file exists/missing, UI correct/incorrect, or validation clean/dirty. Choose Research Loop for baseline-and-metric work such as improve, optimize, optimise, experiment, benchmark, metric, Sharpe, accuracy, latency, score, drawdown, strategy, prompt, model, or performance improvement unless binary success is clearly intended.
+description: Unified iterative workflow triggered by /loop, $loop, or requests to keep working until a task is achieved, verified, optimized, optimised, improved, or reported with improvement stats. Automatically choose Completion Loop for binary success criteria such as fixed/not fixed, tests pass/fail, file exists/missing, UI correct/incorrect, or validation clean/dirty. Choose Research Loop for baseline-and-metric work such as improve, optimize, optimise, experiment, benchmark, metric, Sharpe, accuracy, latency, score, drawdown, strategy, prompt, model, or performance improvement unless binary success is clearly intended. Goal-driven loops continue until the verified target is reached, blocked, or no useful next move remains.
 ---
 
 # Loop
@@ -16,15 +16,17 @@ If the task includes words like improve, optimize, optimise, experiment, benchma
 
 ## Shared Rules
 
-- Start with a goal contract: objective, selected mode, max attempts, success target, verification method, editable scope, and stop conditions.
-- Say max attempts before starting. Default to 5. Treat large limits as an upper bound, not a reason to waste attempts after useful progress is exhausted.
+- Start with a goal contract: objective, selected mode, target result, success criteria or metric target, verification method, editable scope, keep/revert rule when relevant, and stop conditions.
+- For goal-driven work, do not invent an attempt limit. Continue until the verified target is reached, a real blocker is hit, no useful next move remains, or user/tool safety requires stopping.
+- Use an iteration budget only when the user explicitly gives one. If the task is open-ended, first translate it into a measurable target and then loop toward that target.
+- Treat any user-provided round count as a work budget, not a stopping excuse: if the target is reached early, stop; if the budget ends before success, report the remaining gap and the next best move.
 - Auto-loop by default: within the current turn, after each attempt, immediately continue to the next attempt until a stop condition is met.
 - Do not pause to report progress, ask what to try next, or end the turn after one attempt unless a stop condition is met.
-- A progress update may summarize work, but it must not replace the next attempt when attempts remain.
-- Do not stop after the first useful change in open-ended improvement work; continue until max attempts, no useful next attempt exists, or another stop condition is met.
+- A progress update may summarize work, but it must not replace the next attempt when the target is not yet verified.
+- If a command, run, browser check, or long task is interrupted or cut off, resume from the last recorded state and continue the loop. Do not turn an interruption into a final answer unless it is a real blocker after retrying or changing approach.
+- Do not stop after the first useful change in open-ended improvement work; continue until the target is verified, an explicit user-provided budget is exhausted, no useful next attempt exists, or another stop condition is met.
 - Do not declare success without verification.
-- Keep iteration count bounded. Default max attempts: 5; use the user's explicit max when provided.
-- For large limits such as 100 rounds, continue only while each attempt can make useful progress, maintain a scratch log, and checkpoint progress at least every 10 attempts.
+- Keep loops bounded by stop conditions, verification, and useful progress. For large user budgets such as 100 rounds, continue only while each attempt can make useful progress, maintain a scratch log, and checkpoint progress at least every 10 attempts.
 - Never repeat the same failed action unchanged.
 - After every failed or inconclusive attempt, update the strategy before retrying.
 - Maintain task-local memory: attempt number, hypothesis or plan, action taken, result, verification evidence, failure reason or metric delta, lesson learned, next strategy adjustment.
@@ -39,10 +41,10 @@ Before the first attempt, state this compact contract:
 
 - target outcome
 - selected mode and why
-- max attempts
 - success metric or pass/fail criteria
 - verification command or evidence
 - revert/keep rule for changes
+- user-provided iteration budget, only if explicitly provided
 
 ## Completion Loop
 
@@ -56,6 +58,7 @@ Use this for tasks with pass/fail success criteria.
 6. Verify with evidence.
 7. If success criteria pass, stop.
 8. If not, diagnose failure, adjust strategy, and immediately retry.
+9. Do not stop because one attempt was made. Stop only when the pass/fail criteria are verified, a blocker is real, or the next move would violate safety or user approval boundaries.
 
 ## Research Loop
 
@@ -76,6 +79,7 @@ Use this for improvement tasks with a baseline and metric.
 12. If worse, revert the change before the next attempt.
 13. If inconclusive, either revert or keep only if the keep rule allows neutral changes; log why and retry with a sharper experiment.
 14. Update next hypothesis and immediately repeat.
+15. For goal-driven optimization, keep experimenting until the metric target or behavioral target is verified. Do not stop merely because the first improvement was positive.
 
 Prefer disciplined optimization:
 
@@ -128,7 +132,7 @@ For WhatsApp, email, Discord messages, public posts, file sends, or anything tha
 
 ## Stop Conditions
 
-Stop when success is verified, max attempts are reached, required information or credentials are missing, tools are unavailable, external state blocks progress, or continuing would require destructive or external/public action without confirmation.
+Stop when success is verified, an explicit user-provided experiment budget is reached, required information or credentials are missing, tools are unavailable after adapted retries, external state blocks progress, no useful non-repeated next move remains, or continuing would require destructive or external/public action without confirmation.
 
 ## Final Response
 
@@ -140,5 +144,5 @@ Give a final response only after a stop condition is met. Keep it concise and in
 - iteration count
 - improvement stats for optimization or quality loops, including before/after, delta, and percent change when measurable
 - for Research Loop: baseline, final metric, and kept/reverted decision
-- whether max attempts was reached or the loop stopped because no useful next attempt remained
+- whether the verified target was reached, an explicit user-provided budget was reached, or the loop stopped because no useful next attempt remained
 - remaining blocker or risk, if any
