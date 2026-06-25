@@ -1,4 +1,4 @@
 interface:
   display_name: "/loop"
-  short_description: "Verified loops with experiments, revert, and stats"
-  default_prompt: "Use $loop to keep iterating with verified attempts, experiments, revert decisions, and final improvement stats until the target is reached, without inventing a round limit unless the user provides one."
+  short_description: "Auto-looping completion/research workflow with verification-first execution, task-local loop_project logging, and keep/revert decisions."
+  default_prompt: "Use /loop or $loop (or explicit keep iterating phrasing) to run Verification-First loops until the target is verified. Auto-select Completion/Research mode, write per-attempt evidence (attempts.jsonl), track state, and create checkpoints every 10 iterations in large runs."
