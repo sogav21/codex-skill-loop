@@ -304,6 +304,5 @@ class LoopStateTests(unittest.TestCase):
                 self.assertIn("finite", result["error"])
                 self.assertFalse(run.exists())
 
-
 if __name__ == "__main__":
     unittest.main()
