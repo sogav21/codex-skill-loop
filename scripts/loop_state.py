@@ -237,8 +237,8 @@ def initialize(args, run):
         raise ValueError("Target must be finite")
     if args.max_attempts is not None and args.max_attempts < 1:
         raise ValueError("Explicit max-attempts must be positive")
-    if args.timeout_seconds is not None and args.timeout_seconds <= 0:
-        raise ValueError("Explicit timeout must be positive")
+    if args.timeout_seconds is not None and (not math.isfinite(args.timeout_seconds) or args.timeout_seconds <= 0):
+        raise ValueError("Explicit timeout must be positive and finite")
     run.mkdir(parents=True, exist_ok=False)
     with writer_lock(run):
         (run / "control").mkdir()
