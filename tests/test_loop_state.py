@@ -292,6 +292,17 @@ class LoopStateTests(unittest.TestCase):
         self.cli("init", "--source", self.source, "--run", self.source / "loop_project",
                  "--goal", "synthetic", "--verifier", self.verifier, ok=False)
 
+    def test_nonfinite_timeout_is_rejected(self):
+        for value in ("inf", "nan"):
+            with self.subTest(value=value):
+                run = self.root / f"timeout-{value}"
+                result = self.cli("init", "--source", self.source, "--run", run,
+                                  "--goal", "Reach the declared synthetic score",
+                                  "--verifier", self.verifier, "--metric", "score",
+                                  "--direction", "higher", "--target", 3,
+                                  "--timeout-seconds", value, ok=False)
+                self.assertIn("finite", result["error"])
+                self.assertFalse(run.exists())
 
 if __name__ == "__main__":
     unittest.main()
